@@ -4,9 +4,13 @@
 #include "Move.h"
 
 class PawnJump : public Move {
+private:
+	bool enPassant;
 public:
 	PawnJump() : Move() {}
-	PawnJump(Board* board, Piece* piece, int dest) : Move(board, piece, dest, NULL) {}
+	PawnJump(Board* b, Piece* p, int d, bool enPassant) : Move(b, p, d, NULL) {
+		this->enPassant = enPassant;
+	}
 	~PawnJump(){ 
 		// Destructor
 	} 

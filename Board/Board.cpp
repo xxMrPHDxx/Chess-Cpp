@@ -13,6 +13,7 @@
 
 Board::Board(BoardBuilder& builder){
 	this->tiles = builder.tiles;
+	this->enPassantPawn = builder.enPassantPawn;
 
 	std::vector<Piece*> whiteActivePieces, blackActivePieces;
 	for(Tile* tile : tiles){
@@ -24,6 +25,10 @@ Board::Board(BoardBuilder& builder){
 				blackActivePieces.push_back(piece);
 			}
 		}
+	}
+
+	if(enPassantPawn != NULL){
+		std::cout << "Got EnPassant Pawn: " << enPassantPawn << std::endl;
 	}
 	
 	this->whitePlayer = new WhitePlayer(this, whiteActivePieces, blackActivePieces);
@@ -71,10 +76,9 @@ Board* Board::createStandardBoard(){
 		.setPiece(new Knight(63-6, 0))
 		.setPiece(new Rook(63-7, 0))
 
-		// Pawn Attack Test
-		.setPiece(new Pawn(41, 1))
-		.setPiece(new Pawn(43, 1))
-		// End Pawn Attack Test
+		// Test
+		.setPiece(new Pawn(33, 1))
+		// End Test
 
 		// White moves first!
 		.setMoveMaker(0)
@@ -96,6 +100,10 @@ BoardBuilder& BoardBuilder::setPiece(Piece* piece){
 
 BoardBuilder& BoardBuilder::setMoveMaker(int ally){
 	this->ally = ally;
+}
+
+BoardBuilder& BoardBuilder::setEnPassantPawn(Piece* pawn){
+	this->enPassantPawn = pawn;
 }
 
 Board* BoardBuilder::build(){

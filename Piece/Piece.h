@@ -77,6 +77,10 @@ public:
 	virtual bool isSeventhColumnExclusion(int pos, int offset) = 0;
 	virtual bool isEighthColumnExclusion(int pos, int offset) = 0;
 	virtual Piece* makeMove(int dest) = 0;
+	static int getDistance(Piece* p1, Piece* p2){
+		int a = p1->getPosition(), b = p2->getPosition();
+		return a > b ? (a - b) : (b - a);
+	}
 	friend std::ostream& operator <<(std::ostream& out, Piece* piece){
 		int position, type, ally;
 		position = piece->position;

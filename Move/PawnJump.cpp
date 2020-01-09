@@ -6,7 +6,9 @@ Board* PawnJump::execute(){
 		if(this->piece == piece) continue;
 		builder.setPiece(piece);
 	}
-	builder.setPiece(piece->makeMove(destination));
+	Piece* piece = piece->makeMove(destination);
+	builder.setPiece(piece);
+	if(enPassant) builder.setEnPassantPawn(piece);
 	builder.setMoveMaker(1-board->getCurrentPlayer()->getAlliance());
 	return builder.build();
 }

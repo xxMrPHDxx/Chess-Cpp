@@ -2,6 +2,7 @@
 #include "../Move/PawnJump.h"
 #include "../Move/PawnMove.h"
 #include "../Move/PawnAttackMove.h"
+#include "../Move/PawnEnPassantAttackMove.h"
 
 std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 	std::vector<Move*> legalMoves;
@@ -16,7 +17,16 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 			switch(offset){
 				case 16: // Pawn Jump
 					if(!tile->isOccupied() && !behindTile->isOccupied() && isFirstMove()){
-						legalMoves.push_back(new PawnJump(board, this, dest));
+						// EnPassant Pawn
+						Tile *left = board->getTile(dest-1), *right = board->getTile(dest+1);
+						bool enPassantAttack = true;
+						int enPassantPosition;
+						if(!BoardUtils::isFirstColumn(dest-1) &&  left->isOccupied()){
+							enPassantPosition = left->getPosition();
+						}else if(!BoardUtils::isEighthColumn(dest+1) && right->isOccupied()){
+							enPassantPosition = right->getPosition();
+						}else enPassantAttack = false;
+						legalMoves.push_back(new PawnJump(board, this, dest, enPassantAttack));
 					}
 					break;
 				case 8: // Pawn Move
@@ -30,9 +40,9 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 						}
 					}
 					break;
-				case 7: // PawnAttackMove
+				case 7:
 				case 9:
-					if(tile->isOccupied()){
+					if(tile->isOccupied()){ // PawnAttackMove
 						Piece* piece = tile->getPiece();
 						if(piece->getAlliance() != ally){
 							if(isWhite() && BoardUtils::isSecondRow(position)){
@@ -42,6 +52,23 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 							}else{
 								legalMoves.push_back(new PawnAttackMove(board, this, dest, piece));
 							}
+						}
+					}else if(board->hasEnPassantPawn()){ // EnPassant Attack
+						Piece* enPassantPawn = board->getEnPassantPawn();
+						Tile* behind = board->getTile(enPassantPawn->getPosition() + 8*getDirection());
+						if(Piece::getDistance(this, enPassantPawn) == 1 &&
+							behind->getPosition() == dest && 
+							enPassantPawn->getAlliance() != ally){
+							std::cout << "Pawn::this" << std::endl;
+							std::cout << "\t" << this << std::endl;
+							std::cout << "Pawn::enPassantPawn" << std::endl;
+							std::cout << "\t" << enPassantPawn << std::endl;
+							legalMoves.push_back(new PawnEnPassantAttackMove(
+								board, 
+								this, 
+								dest, 
+								enPassantPawn
+							));
 						}
 					}
 			}

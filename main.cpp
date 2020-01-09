@@ -16,6 +16,7 @@
 #include <Move/PawnMove.cpp>
 #include <Move/PawnJump.cpp>
 #include <Move/PawnAttackMove.cpp>
+#include <Move/PawnEnPassantAttackMove.cpp>
 #include <Move/MoveFactory.cpp>
 
 #include <Player/Player.cpp>
@@ -132,20 +133,19 @@ int main(){
 									}
 								}else{
 									destTile = board->getTile(mIndex);
-									Move* move = MoveFactory::createMove(
+									MoveTransition transition = MoveFactory::createMove(
 										board, 
 										sourceTile->getPosition(),
 										destTile->getPosition()
 									);
-									if(move != NULL){
+									if(transition.isSuccess()){
 										// std::cout << "Got Move: " << move->toString() << std::endl;
-
-										Board* transitionBoard = move->execute();
-										if(transitionBoard != NULL){
-											std::cout << "Executing Move: " << move->toString() << std::endl;
-											delete board;
-											board = transitionBoard;
-										}
+										Move* move = transition.getMove();
+										std::cout << "Executing Move: " << move->toString() << std::endl;
+										delete board;
+										board = transition.getBoard();
+									}else{
+										std::cout << transition.getStatus() << std::endl;
 									}
 
 									sourceTile = destTile = NULL;

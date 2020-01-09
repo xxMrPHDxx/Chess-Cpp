@@ -24,6 +24,7 @@ Player::Player(int ally, Board* board,
 		ss << " Player!";
 		throw std::invalid_argument(ss.str());
 	}
+	this->inCheck = calculateAttackOnTile(opponentLegals, king->getPosition()).size() > 0;
 }
 
 std::vector<Move*> Player::calculateLegalMoves(Board* board, std::vector<Piece*> pieces, int ally){
@@ -34,4 +35,13 @@ std::vector<Move*> Player::calculateLegalMoves(Board* board, std::vector<Piece*>
 		}
 	}
 	return legalMoves;
+}
+
+std::vector<Move*> Player::calculateAttackOnTile(std::vector<Move*> legalMoves, int pos){
+	std::vector<Move*> attackMoves;
+	for(Move* move : legalMoves){
+		if(!move->isAttack()) continue;
+		if(move->getDestination() == pos) attackMoves.push_back(move);
+	}
+	return attackMoves;
 }

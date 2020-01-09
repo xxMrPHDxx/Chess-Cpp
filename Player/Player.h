@@ -25,6 +25,10 @@ public:
 	std::vector<Move*> getLegalMoves(){ return this->legalMoves; }
 	Piece* getKing(){ return this->king; }
 	Player* getOpponent();
+	bool isInCheck(){ return this->inCheck; }
+	bool isInCheckMate();
+	bool isInStaleMate(){ return false; }
+	static std::vector<Move*> calculateAttackOnTile(std::vector<Move*> legalMoves, int pos);
 	friend std::ostream& operator <<(std::ostream& out, Player* player){
 		if(player->ally == -1) throw std::invalid_argument("Invalid player ally!");
 		switch(player->ally){
