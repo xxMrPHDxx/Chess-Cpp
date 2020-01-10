@@ -15,15 +15,19 @@ Board::Board(BoardBuilder& builder){
 	this->tiles = builder.tiles;
 	this->enPassantPawn = builder.enPassantPawn;
 
-	std::vector<Piece*> whiteActivePieces, blackActivePieces;
+	std::vector<Move*> whiteMoves, blackMoves;
 	for(Tile* tile : tiles){
 		if(tile->isOccupied()){
 			Piece* piece = tile->getPiece();
 			if(piece->getAlliance() == 0){
-				whiteActivePieces.push_back(piece);
-			}else if(piece->getAlliance() == 1){
-				blackActivePieces.push_back(piece);
+				whitePieces.push_back(piece);
+				for(Move* move : piece->calculateLegalMoves(this)) whiteMoves.push_back(move);
 			}
+			else if(piece->getAlliance() == 1){
+				blackPieces.push_back(piece);
+				for(Move* move : piece->calculateLegalMoves(this)) blackMoves.push_back(move);
+			}
+			
 		}
 	}
 
@@ -31,20 +35,12 @@ Board::Board(BoardBuilder& builder){
 		std::cout << "Got EnPassant Pawn: " << enPassantPawn << std::endl;
 	}
 	
-	this->whitePlayer = new WhitePlayer(this, whiteActivePieces, blackActivePieces);
-	this->blackPlayer = new BlackPlayer(this, blackActivePieces, whiteActivePieces);
+	std::cout << "Creating white player..." << std::endl;
+	this->whitePlayer = new WhitePlayer(this, whiteMoves, blackMoves);
+	std::cout << "Creating black player..." << std::endl;
+	this->blackPlayer = new BlackPlayer(this, blackMoves, whiteMoves);
+	std::cout << "Choosing player..." << std::endl;
 	this->currentPlayer = builder.choosePlayer(whitePlayer, blackPlayer);
-}
-
-std::vector<Piece*> Board::getAllActivePieces(){
-	std::vector<Piece*> activePieces;
-	for(Piece* piece : whitePlayer->getActivePieces()){
-		activePieces.push_back(piece);
-	}
-	for(Piece* piece : blackPlayer->getActivePieces()){
-		activePieces.push_back(piece);
-	}
-	return activePieces;
 }
 
 Board* Board::createStandardBoard(){
@@ -77,7 +73,7 @@ Board* Board::createStandardBoard(){
 		.setPiece(new Rook(63-7, 0))
 
 		// Test
-		.setPiece(new Pawn(33, 1))
+		// .setPiece(new Pawn(33, 1))
 		// End Test
 
 		// White moves first!

@@ -6,28 +6,27 @@ class Board;
 class Piece;
 
 class Player {
-private:
-	static std::vector<Move*> calculateLegalMoves(Board* board, std::vector<Piece*> pieces, int ally);
 protected:
 	int ally = -1;
-	std::vector<Piece*> activePieces;
+	Board* board;
 	std::vector<Move*> legalMoves;
 	Piece* king;
 	bool inCheck = false;
 public:
 	Player(){}
-	Player(int ally, Board* board, std::vector<Piece*> activePieces, std::vector<Piece*> opponentActivePieces);
+	Player(int ally, Board* board, std::vector<Move*> moves, std::vector<Move*> opponentMoves);
 	virtual ~Player(){
 		// Destructor
 	}
 	int getAlliance(){ return this->ally; }
-	std::vector<Piece*> getActivePieces(){ return this->activePieces; }
 	std::vector<Move*> getLegalMoves(){ return this->legalMoves; }
 	Piece* getKing(){ return this->king; }
-	Player* getOpponent();
 	bool isInCheck(){ return this->inCheck; }
 	bool isInCheckMate();
-	bool isInStaleMate(){ return false; }
+	bool isInStaleMate();
+	bool hasEscapeMoves();
+	virtual Player* getOpponent() = 0;
+	virtual std::vector<Piece*> getActivePieces() = 0;
 	static std::vector<Move*> calculateAttackOnTile(std::vector<Move*> legalMoves, int pos);
 	friend std::ostream& operator <<(std::ostream& out, Player* player){
 		if(player->ally == -1) throw std::invalid_argument("Invalid player ally!");
@@ -45,13 +44,17 @@ public:
 class WhitePlayer : public Player {
 public:
 	WhitePlayer() : Player() {}
-	WhitePlayer(Board* b, std::vector<Piece*> ap, std::vector<Piece*> oap) : Player(0, b, ap, oap) {}
+	WhitePlayer(Board* b, std::vector<Move*> m, std::vector<Move*> om) : Player(0, b, m, om) {}
+	Player* getOpponent() override;
+	std::vector<Piece*> getActivePieces() override;
 };
 
 class BlackPlayer : public Player {
 public:
 	BlackPlayer() : Player() {}
-	BlackPlayer(Board* b, std::vector<Piece*> ap, std::vector<Piece*> oap) : Player(1, b, ap, oap) {}
+	BlackPlayer(Board* b, std::vector<Move*> m, std::vector<Move*> om) : Player(1, b, m, om) {}
+	Player* getOpponent() override;
+	std::vector<Piece*> getActivePieces() override;
 };
 
 #endif

@@ -59,10 +59,6 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 						if(Piece::getDistance(this, enPassantPawn) == 1 &&
 							behind->getPosition() == dest && 
 							enPassantPawn->getAlliance() != ally){
-							std::cout << "Pawn::this" << std::endl;
-							std::cout << "\t" << this << std::endl;
-							std::cout << "Pawn::enPassantPawn" << std::endl;
-							std::cout << "\t" << enPassantPawn << std::endl;
 							legalMoves.push_back(new PawnEnPassantAttackMove(
 								board, 
 								this, 

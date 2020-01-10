@@ -1,20 +1,16 @@
 #include "Player.h"
 #include "../Board/Board.h"
+#include "../Move/MoveFactory.h"
+#include "../Move/MoveTransition.h"
 
-Player::Player(int ally, Board* board, 
-		std::vector<Piece*> activePieces, 
-		std::vector<Piece*> opponentActivePieces) {
+Player::Player(int ally, Board* board, std::vector<Move*> moves, std::vector<Move*> opponentMoves) {
 	this->ally = ally;
-	this->activePieces = activePieces;
-
-	std::vector<Move*> legals         = calculateLegalMoves(board, activePieces, ally);
-	std::vector<Move*> opponentLegals = calculateLegalMoves(board, opponentActivePieces, 1-ally);
-
-	this->legalMoves = legals;
-	this->king = NULL;
-	for(Tile* tile : board->getTiles()){
-		if(tile->isOccupied() && tile->getPiece()->getAlliance() == ally && tile->getPiece()->getType() == 4){
-			this->king = tile->getPiece();
+	this->board = board;
+	this->legalMoves = moves;
+	this->king = NULL; 
+	for(Piece* piece : board->getAllActivePieces()){
+		if(piece->getAlliance() == ally && piece->getType() == 4){
+			this->king = piece;
 		}
 	}
 	if(this->king == NULL){
@@ -24,17 +20,32 @@ Player::Player(int ally, Board* board,
 		ss << " Player!";
 		throw std::invalid_argument(ss.str());
 	}
-	this->inCheck = calculateAttackOnTile(opponentLegals, king->getPosition()).size() > 0;
+	this->inCheck = calculateAttackOnTile(opponentMoves, king->getPosition()).size() > 0;
 }
 
-std::vector<Move*> Player::calculateLegalMoves(Board* board, std::vector<Piece*> pieces, int ally){
-	std::vector<Move*> legalMoves;
-	for(Piece* piece : pieces){
-		for(Move* move : piece->calculateLegalMoves(board)){
-			legalMoves.push_back(move);
-		}
+bool Player::isInCheckMate(){
+	return inCheck && !hasEscapeMoves();
+}
+
+bool Player::isInStaleMate(){
+	return !inCheck && !hasEscapeMoves();
+}
+
+bool Player::hasEscapeMoves(){
+	std::vector<Move*> escapeMoves;
+	int i = 1;
+	if(inCheck)
+	for(Move* move : legalMoves){
+		std::cout << "Executing move: " << move->toString() << std::endl;
+		// move->execute();
+		MoveTransition transition = MoveFactory::createMove(move);
+		// std::cout << transition.getStatus() << std::endl;
+		// if(board == NULL) std::cout << "Board is NULL!" << std::endl;
+		if(!transition.isSuccess()) continue;
+		escapeMoves.push_back(move); i++;
 	}
-	return legalMoves;
+	// if(player->inCheck) std::cout << "Found " << i << " escape moves" << std::endl;
+	return escapeMoves.size() > 0;
 }
 
 std::vector<Move*> Player::calculateAttackOnTile(std::vector<Move*> legalMoves, int pos){
@@ -44,4 +55,20 @@ std::vector<Move*> Player::calculateAttackOnTile(std::vector<Move*> legalMoves, 
 		if(move->getDestination() == pos) attackMoves.push_back(move);
 	}
 	return attackMoves;
+}
+
+Player* WhitePlayer::getOpponent(){
+	return board->getBlackPlayer();
+}
+
+Player* BlackPlayer::getOpponent(){
+	return board->getWhitePlayer();
+}
+
+std::vector<Piece*> WhitePlayer::getActivePieces(){
+	return this->board->getWhitePieces();
+}
+
+std::vector<Piece*> BlackPlayer::getActivePieces(){
+	return this->board->getBlackPieces();
 }

@@ -37,7 +37,7 @@ public:
 	virtual std::string toString(){
 		std::stringstream ss;
 		ss << (!isOccupied() ? "-" : this->piece->toString());
-		ss << "[" << (this->position < 10 ? "0" : "") << this->position << "]";
+		// ss << "[" << (this->position < 10 ? "0" : "") << this->position << "]";
 		return ss.str();
 	}
 };

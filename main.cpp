@@ -81,7 +81,7 @@ int main(){
 	t2.loadFromFile("img/figures.png");
 	t3.loadFromFile("img/ui.png");
 
-	Sprite sBoard(t1), sPieces[12], sGreenDot(t3), sRedDot(t3);
+	Sprite sBoard(t1), sPieces[12], sGreenDot(t3), sRedDot(t3), sCheck(t3), sCheckMate(t3);
 	for(int i=0,n=0;i<2;i++){
 		for(int j=0;j<6;j++){
 			sPieces[n] = Sprite(t2);
@@ -90,6 +90,8 @@ int main(){
 	}
 	sGreenDot.setTextureRect(IntRect(0*56, 0*56, 56, 56));
 	sRedDot.setTextureRect(IntRect(1*56, 0*56, 56, 56));
+	sCheck.setTextureRect(IntRect(0*56, 1*56, 56, 56));
+	sCheckMate.setTextureRect(IntRect(1*56, 1*56, 56, 56));
 
 	Event e;
 	Vector2i mouse;
@@ -150,7 +152,6 @@ int main(){
 
 									sourceTile = destTile = NULL;
 								}
-
 							}
 							shouldRedraw = true;
 							break;
@@ -165,6 +166,22 @@ int main(){
 
 		if(shouldRedraw){
 			app.draw(sBoard);
+			if(shouldRedrawHint){
+				Sprite s; Player* p = NULL;
+				if(board->getCurrentPlayer()->isInCheckMate() || board->getOpponentPlayer()->isInCheckMate()){
+					p = board->getCurrentPlayer()->isInCheckMate() ? board->getCurrentPlayer() : board->getOpponentPlayer();
+					s = sCheckMate;
+				}else if(board->getCurrentPlayer()->isInCheck() || board->getOpponentPlayer()->isInCheck()){
+					p = board->getCurrentPlayer()->isInCheck() ? board->getCurrentPlayer() : board->getOpponentPlayer();
+					s = sCheck;
+				}
+				if(p != NULL){
+					int pos = p->getKing()->getPosition();
+					int r = pos / BoardUtils::NUM_ROWS, c = pos % BoardUtils::NUM_ROWS;
+					s.setPosition((c+0.5f)*56, (r+0.5f)*56);
+					app.draw(s);
+				}
+			}
 			drawBoard(app, sPieces, board);
 		}
 		if(shouldRedrawHint){
