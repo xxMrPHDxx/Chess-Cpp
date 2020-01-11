@@ -42,7 +42,7 @@ void drawBoard(RenderWindow& app, Sprite sPieces[], Board* board){
 			col = i % BoardUtils::NUM_ROWS;
 			Piece* piece = tile->getPiece();
 			Sprite& s = sPieces[piece->getSpriteIndex()];
-			s.setPosition(28+col*56, 28+row*56);
+			s.setPosition(28 + col*56, 28 + row*56);
 			app.draw(s);
 		}
 	}
@@ -62,25 +62,7 @@ public:
 int main(){
 	RenderWindow app(VideoMode(504, 504), "Chess");
 
-	// Board* board = Board::createStandardBoard();
-	// Board* board = createCheckBoard();
-	// Board* board = createCheckMateBoard();
-	// Board* board = createStaleMateBoard();
-	Board* board = createCastlingBoard();
-	// std::cout << board << std::endl;
-
-	if(false)
-	for(int i=0;i<64;i++){
-		Tile* tile = board->getTile(i);
-		if(tile->isOccupied()){
-			Piece* piece = tile->getPiece();
-			std::cout << piece << std::endl;
-			std::cout << "\tSprite Index: " << 
-				piece->getSpriteIndex() << std::endl;
-			std::cout << "\tNum of moves: " <<
-				piece->calculateLegalMoves(board).size() << std::endl;
-		}
-	}
+	Board* board = Board::createStandardBoard();
 
 	Texture t1, t2, t3;
 	t1.loadFromFile("img/board.png");
@@ -148,7 +130,6 @@ int main(){
 										destTile->getPosition()
 									);
 									if(transition.isSuccess()){
-										// std::cout << "Got Move: " << move->toString() << std::endl;
 										Move* move = transition.getMove();
 										std::cout << "Executing Move: " << move->toString() << std::endl;
 										delete board;
