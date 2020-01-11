@@ -35,6 +35,7 @@ public:
 	bool isWhite(){ return this->ally == 0; }
 	bool isBlack(){ return this->ally == 1; }
 	bool isFirstMove(){ return this->firstMove; }
+	bool isKing(){ return this->type == 4; }
 	virtual int getDirection(){ return this->ally == 0 ? -1 : 1; }
 	virtual int getSpriteIndex(){
 		return (1-ally) * 6 + type;

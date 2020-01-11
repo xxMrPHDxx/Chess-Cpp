@@ -3,6 +3,7 @@
 #include "../Move/PawnMove.h"
 #include "../Move/PawnAttackMove.h"
 #include "../Move/PawnEnPassantAttackMove.h"
+#include "../Move/PawnPromotion.h"
 
 std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 	std::vector<Move*> legalMoves;
@@ -31,10 +32,10 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 					break;
 				case 8: // Pawn Move
 					if(!tile->isOccupied()){
-						if(isWhite() && BoardUtils::isSecondRow(position)){
-							// White's Pawn Promotion
-						}else if(isBlack() && BoardUtils::isSeventhRow(position)){
-							// Black's Pawn Promotion
+						bool whitePromotion = isWhite() && BoardUtils::isSecondRow(position);
+						bool blackPromotion = isBlack() && BoardUtils::isSeventhRow(position);
+						if(whitePromotion || blackPromotion){
+							legalMoves.push_back(new PawnPromotion(board, this, dest));
 						}else{
 							legalMoves.push_back(new PawnMove(board, this, dest));
 						}
@@ -45,10 +46,10 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 					if(tile->isOccupied()){ // PawnAttackMove
 						Piece* piece = tile->getPiece();
 						if(piece->getAlliance() != ally){
-							if(isWhite() && BoardUtils::isSecondRow(position)){
-								// White's Pawn Promotion
-							}else if(isBlack() && BoardUtils::isSeventhRow(position)){
-								// Black's Pawn Promotion
+							bool whitePromotion = isWhite() && BoardUtils::isSecondRow(position);
+							bool blackPromotion = isBlack() && BoardUtils::isSeventhRow(position);
+							if(whitePromotion || blackPromotion){
+								legalMoves.push_back(new PawnPromotion(board, this, dest, piece));
 							}else{
 								legalMoves.push_back(new PawnAttackMove(board, this, dest, piece));
 							}
@@ -67,6 +68,7 @@ std::vector<Move*> Pawn::calculateLegalMoves(Board* board){
 							));
 						}
 					}
+					break;
 			}
 		}
 	}

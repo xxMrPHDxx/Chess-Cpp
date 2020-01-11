@@ -11,12 +11,14 @@
 #include <Piece/King.cpp>
 #include <Piece/Pawn.cpp>
 
-#include <Move/MajorMove.cpp>
 #include <Move/AttackMove.cpp>
+#include <Move/CastlingMove.cpp>
+#include <Move/MajorMove.cpp>
 #include <Move/PawnMove.cpp>
 #include <Move/PawnJump.cpp>
 #include <Move/PawnAttackMove.cpp>
 #include <Move/PawnEnPassantAttackMove.cpp>
+#include <Move/PawnPromotion.cpp>
 #include <Move/MoveFactory.cpp>
 
 #include <Player/Player.cpp>
@@ -60,7 +62,11 @@ public:
 int main(){
 	RenderWindow app(VideoMode(504, 504), "Chess");
 
-	Board* board = Board::createStandardBoard();
+	// Board* board = Board::createStandardBoard();
+	// Board* board = createCheckBoard();
+	// Board* board = createCheckMateBoard();
+	// Board* board = createStaleMateBoard();
+	Board* board = createCastlingBoard();
 	// std::cout << board << std::endl;
 
 	if(false)
@@ -81,7 +87,7 @@ int main(){
 	t2.loadFromFile("img/figures.png");
 	t3.loadFromFile("img/ui.png");
 
-	Sprite sBoard(t1), sPieces[12], sGreenDot(t3), sRedDot(t3), sCheck(t3), sCheckMate(t3);
+	Sprite sBoard(t1), sPieces[12], sGreenDot(t3), sRedDot(t3), sCheck(t3), sCheckMate(t3), sStaleMate(t3);
 	for(int i=0,n=0;i<2;i++){
 		for(int j=0;j<6;j++){
 			sPieces[n] = Sprite(t2);
@@ -92,6 +98,7 @@ int main(){
 	sRedDot.setTextureRect(IntRect(1*56, 0*56, 56, 56));
 	sCheck.setTextureRect(IntRect(0*56, 1*56, 56, 56));
 	sCheckMate.setTextureRect(IntRect(1*56, 1*56, 56, 56));
+	sStaleMate.setTextureRect(IntRect(2*56, 1*56, 56, 56));
 
 	Event e;
 	Vector2i mouse;
@@ -174,6 +181,9 @@ int main(){
 				}else if(board->getCurrentPlayer()->isInCheck() || board->getOpponentPlayer()->isInCheck()){
 					p = board->getCurrentPlayer()->isInCheck() ? board->getCurrentPlayer() : board->getOpponentPlayer();
 					s = sCheck;
+				}else if(board->getCurrentPlayer()->isInStaleMate() || board->getOpponentPlayer()->isInStaleMate()){
+					p = board->getCurrentPlayer()->isInStaleMate() ? board->getCurrentPlayer() : board->getOpponentPlayer();
+					s = sStaleMate;
 				}
 				if(p != NULL){
 					int pos = p->getKing()->getPosition();

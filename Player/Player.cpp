@@ -32,19 +32,14 @@ bool Player::isInStaleMate(){
 }
 
 bool Player::hasEscapeMoves(){
+	if(board->getCurrentPlayer()->getAlliance() != this->ally) return true;
 	std::vector<Move*> escapeMoves;
 	int i = 1;
-	if(inCheck)
 	for(Move* move : legalMoves){
-		std::cout << "Executing move: " << move->toString() << std::endl;
-		// move->execute();
 		MoveTransition transition = MoveFactory::createMove(move);
-		// std::cout << transition.getStatus() << std::endl;
-		// if(board == NULL) std::cout << "Board is NULL!" << std::endl;
 		if(!transition.isSuccess()) continue;
 		escapeMoves.push_back(move); i++;
 	}
-	// if(player->inCheck) std::cout << "Found " << i << " escape moves" << std::endl;
 	return escapeMoves.size() > 0;
 }
 

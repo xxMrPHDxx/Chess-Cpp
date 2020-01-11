@@ -27,19 +27,11 @@ Board::Board(BoardBuilder& builder){
 				blackPieces.push_back(piece);
 				for(Move* move : piece->calculateLegalMoves(this)) blackMoves.push_back(move);
 			}
-			
 		}
 	}
-
-	if(enPassantPawn != NULL){
-		std::cout << "Got EnPassant Pawn: " << enPassantPawn << std::endl;
-	}
 	
-	std::cout << "Creating white player..." << std::endl;
 	this->whitePlayer = new WhitePlayer(this, whiteMoves, blackMoves);
-	std::cout << "Creating black player..." << std::endl;
 	this->blackPlayer = new BlackPlayer(this, blackMoves, whiteMoves);
-	std::cout << "Choosing player..." << std::endl;
 	this->currentPlayer = builder.choosePlayer(whitePlayer, blackPlayer);
 }
 
@@ -71,14 +63,8 @@ Board* Board::createStandardBoard(){
 		.setPiece(new Bishop(63-5, 0))
 		.setPiece(new Knight(63-6, 0))
 		.setPiece(new Rook(63-7, 0))
-
-		// Test
-		// .setPiece(new Pawn(33, 1))
-		// End Test
-
 		// White moves first!
 		.setMoveMaker(0)
-
 		.build();
 }
 
@@ -112,4 +98,58 @@ Player* BoardBuilder::choosePlayer(WhitePlayer* white, BlackPlayer* black){
 		case 1: return black;
 		default: throw std::invalid_argument("Invalid move maker alliance!");
 	}
+}
+
+/*======================   TEST BOARDS   ====================*/
+
+Board* createCheckBoard(){
+	return BoardBuilder()
+		.setPiece(new King(3, 1))
+		.setPiece(new King(63-4, 0))
+		.setPiece(new Queen(17, 0))
+		.setMoveMaker(1)
+		.build();
+}
+
+Board* createCheckMateBoard(){
+	return BoardBuilder()
+		.setPiece(new King(3, 1))
+		.setPiece(new King(63-4, 0))
+		.setPiece(new Queen(10, 0))
+		.setPiece(new Queen(12, 0))
+		.setMoveMaker(1)
+		.build();
+}
+
+Board* createStaleMateBoard(){
+	return BoardBuilder()
+		.setPiece(new King(3+1, 1))
+		.setPiece(new King(63-4+1, 0))
+		.setPiece(new Rook(10+1, 0))
+		.setPiece(new Rook(12+1, 0))
+		.setMoveMaker(1)
+		.build();
+}
+
+Board* createCastlingBoard(){
+	BoardBuilder builder;
+	// Black and White Pawns
+	for(int i=0;i<2;i++){ 
+		for(int j=i?8:48,k=0;k<8;k++){
+			builder.setPiece(new Pawn(j+k, i));
+		}
+	}
+
+	return builder
+		// Black Pieces
+		.setPiece(new Rook(0, 1))
+		.setPiece(new King(3, 1))
+		.setPiece(new Rook(7, 1))
+		// White Pieces
+		.setPiece(new Rook(63-0, 0))
+		.setPiece(new King(63-4, 0))
+		.setPiece(new Rook(63-7, 0))
+		// White moves first!
+		.setMoveMaker(0)
+		.build();
 }
